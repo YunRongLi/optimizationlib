@@ -18,13 +18,13 @@ const (
 )
 
 type FiSearch struct {
-	coe, eps    float64
+	Coe, eps    float64
 	cost        costFunction
 }
 
 func NewFiSearch(eps float64, cost costFunction) FiSearch {
 	search := FiSearch{}
-	search.coe = 1.618
+	search.Coe = 1.618
 	search.eps = eps
 	search.cost = cost
 
@@ -56,12 +56,12 @@ func (search FiSearch) phase1(x, direction []float64) Phase1Results {
 	index := 1
 	for {
 		if index == 1 {
-			ph1Result.g = ph1Result.g_1 + delta * math.Pow(search.coe, float64(index))
+			ph1Result.g = ph1Result.g_1 + delta * math.Pow(search.Coe, float64(index))
 			ph1Result.fg = search.cost(search.computeWeights(x, direction, ph1Result.g))
 		} else {
 			ph1Result.g_2 = ph1Result.g_1
 			ph1Result.g_1 = ph1Result.g
-			ph1Result.g = ph1Result.g_1 + delta*math.Pow(search.coe, float64(index))
+			ph1Result.g = ph1Result.g_1 + delta*math.Pow(search.Coe, float64(index))
 
 			ph1Result.fg_2 = ph1Result.fg_1
 			ph1Result.fg_1 = ph1Result.fg
