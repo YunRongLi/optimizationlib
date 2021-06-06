@@ -22,7 +22,7 @@ type FiSearch struct {
 	cost        costFunction
 }
 
-func newFiSearch(eps float64, cost costFunction) FiSearch {
+func NewFiSearch(eps float64, cost costFunction) FiSearch {
 	search := FiSearch{}
 	search.coe = 1.618
 	search.eps = eps
@@ -153,7 +153,7 @@ func (search FiSearch) phase2(x, direction []float64, ph1Result Phase1Results) f
 	return (intervalUpper + intervalLower) / 2
 }
 
-func (search FiSearch) search(x, direction []float64) float64 {
+func (search FiSearch) Search(x, direction []float64) float64 {
 	var min_x float64
 	ph1Result := Phase1Results{} // no assign specific value, default parameters will be 0
 	ph1Result = search.phase1(x, direction)
