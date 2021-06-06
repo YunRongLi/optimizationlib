@@ -1,4 +1,4 @@
-package optimizationlib
+package search
 
 import (
 	"math"
