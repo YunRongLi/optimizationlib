@@ -17,21 +17,34 @@ const (
 	needChangeBoth
 )
 
-type FiSearch struct {
-	coe, Eps    float64
-	Cost        costFunction
+type Method int
+
+const (
+	GoldenSection Method = iota
+	Fibonacci
+)
+
+func (m Method) String() string {
+	return [...]string{"GoldenSection", "Fibonacci"}[m]
 }
 
-func NewFiSearch(Eps float64, Cost costFunction) FiSearch {
-	search := FiSearch{}
+type Searcher struct {
+	coe, Eps    float64
+	Cost        costFunction
+	CurrentMethod Method      
+}
+
+func NewSearch(Eps float64, Cost costFunction, m Method) Searcher {
+	search := Searcher{}
 	search.coe = 1.618
 	search.Eps = Eps
 	search.Cost = Cost
+	search.CurrentMethod = m
 
 	return search
 }
 
-func (search FiSearch) computeWeights(x, direction []float64, w float64) []float64 {
+func (search Searcher) computeWeights(x, direction []float64, w float64) []float64 {
 	wg := make([]float64, len(direction))
 	for i, d := range direction {
 		wg[i] = x[i] + w * d
@@ -40,7 +53,7 @@ func (search FiSearch) computeWeights(x, direction []float64, w float64) []float
 	return wg
 }
 
-func (search FiSearch) phase1(x, direction []float64) Phase1Results {
+func (search Searcher) phase1(x, direction []float64) Phase1Results {
 	var ph1Result Phase1Results
 	var delta float64
 	delta = 0.1
@@ -77,7 +90,7 @@ func (search FiSearch) phase1(x, direction []float64) Phase1Results {
 	}
 }
 
-func (search FiSearch) phase2(x, direction []float64, ph1Result Phase1Results) float64 {
+func (search Searcher) gsPhase2(x, direction []float64, ph1Result Phase1Results) float64 {
 	rho := 0.382
 	interval, intervalUpper, intervalLower := 0.0, 0.0, 0.0
 	needChangeBound := noNeedChange
@@ -153,11 +166,14 @@ func (search FiSearch) phase2(x, direction []float64, ph1Result Phase1Results) f
 	return (intervalUpper + intervalLower) / 2
 }
 
-func (search FiSearch) Search(x, direction []float64) float64 {
+func (search Searcher) Search(x, direction []float64) float64 {
 	var min_x float64
 	ph1Result := Phase1Results{} // no assign specific value, default parameters will be 0
 	ph1Result = search.phase1(x, direction)
-	min_x = search.phase2(x, direction, ph1Result)
+	switch search.CurrentMethod {
+	case GoldenSection:
+		min_x = search.gsPhase2(x, direction, ph1Result)
+	}
 
 	return min_x
 }
