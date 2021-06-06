@@ -18,15 +18,15 @@ const (
 )
 
 type FiSearch struct {
-	Coe, eps    float64
-	cost        costFunction
+	coe, Eps    float64
+	Cost        costFunction
 }
 
-func NewFiSearch(eps float64, cost costFunction) FiSearch {
+func NewFiSearch(Eps float64, Cost costFunction) FiSearch {
 	search := FiSearch{}
-	search.Coe = 1.618
-	search.eps = eps
-	search.cost = cost
+	search.coe = 1.618
+	search.Eps = Eps
+	search.Cost = Cost
 
 	return search
 }
@@ -46,8 +46,8 @@ func (search FiSearch) phase1(x, direction []float64) Phase1Results {
 	delta = 0.1
 	ph1Result.g_1 = delta
 
-	ph1Result.fg_1 = search.cost(search.computeWeights(x, direction, ph1Result.g_1))
-	ph1Result.fg_2 = search.cost(search.computeWeights(x, direction, ph1Result.g_2))
+	ph1Result.fg_1 = search.Cost(search.computeWeights(x, direction, ph1Result.g_1))
+	ph1Result.fg_2 = search.Cost(search.computeWeights(x, direction, ph1Result.g_2))
 
 	if ph1Result.fg_1 >= ph1Result.fg_2 {
 		return ph1Result
@@ -56,17 +56,17 @@ func (search FiSearch) phase1(x, direction []float64) Phase1Results {
 	index := 1
 	for {
 		if index == 1 {
-			ph1Result.g = ph1Result.g_1 + delta * math.Pow(search.Coe, float64(index))
-			ph1Result.fg = search.cost(search.computeWeights(x, direction, ph1Result.g))
+			ph1Result.g = ph1Result.g_1 + delta * math.Pow(search.coe, float64(index))
+			ph1Result.fg = search.Cost(search.computeWeights(x, direction, ph1Result.g))
 		} else {
 			ph1Result.g_2 = ph1Result.g_1
 			ph1Result.g_1 = ph1Result.g
-			ph1Result.g = ph1Result.g_1 + delta*math.Pow(search.Coe, float64(index))
+			ph1Result.g = ph1Result.g_1 + delta*math.Pow(search.coe, float64(index))
 
 			ph1Result.fg_2 = ph1Result.fg_1
 			ph1Result.fg_1 = ph1Result.fg
 
-			ph1Result.fg = search.cost(search.computeWeights(x, direction, ph1Result.g))
+			ph1Result.fg = search.Cost(search.computeWeights(x, direction, ph1Result.g))
 		}
 
 		if ph1Result.fg_2 > ph1Result.fg_1 && ph1Result.fg_1 < ph1Result.fg {
@@ -90,13 +90,13 @@ func (search FiSearch) phase2(x, direction []float64, ph1Result Phase1Results) f
 	intervalLower = ph1Result.g_2
 	
 	interval = intervalUpper - intervalLower
-	if interval < search.eps {
+	if interval < search.Eps {
 		return (intervalUpper + intervalLower) / 2
 	}
 
 	maxIter := 0
 	for {
-		if math.Pow(0.61893, float64(maxIter)) <= (search.eps / interval) {
+		if math.Pow(0.61893, float64(maxIter)) <= (search.Eps / interval) {
 			break;
 		}
 		maxIter += 1
@@ -109,29 +109,29 @@ func (search FiSearch) phase2(x, direction []float64, ph1Result Phase1Results) f
 				alpha = ph1Result.g_1
 				beta = intervalLower + (1 - rho) * interval
 				f_alpha = ph1Result.fg_1
-				f_beta = search.cost(search.computeWeights(x, direction, beta))
+				f_beta = search.Cost(search.computeWeights(x, direction, beta))
 			} else {
 				alpha = intervalLower + rho * interval
 				beta  = intervalLower + (1 - rho) * interval
-				f_alpha = search.cost(search.computeWeights(x, direction, alpha))
-				f_beta  = search.cost(search.computeWeights(x, direction, beta)) 
+				f_alpha = search.Cost(search.computeWeights(x, direction, alpha))
+				f_beta  = search.Cost(search.computeWeights(x, direction, beta)) 
 			}
 		} else {
 			if needChangeBound == needChangeLower {
 				alpha = beta
 				f_alpha = f_beta
 				beta = intervalLower + (1 - rho) * interval
-				f_beta = search.cost(search.computeWeights(x, direction, beta))
+				f_beta = search.Cost(search.computeWeights(x, direction, beta))
 			} else if needChangeBound == needChangeUpper {
 				beta = alpha
 				f_beta = f_alpha
 				alpha = intervalLower + rho * interval
-				f_alpha = search.cost(search.computeWeights(x, direction, alpha))
+				f_alpha = search.Cost(search.computeWeights(x, direction, alpha))
 			} else {
 				alpha = intervalLower + rho * interval
 				beta  = intervalLower + (1 - rho) * interval
-				f_alpha = search.cost(search.computeWeights(x, direction, alpha))
-				f_beta  = search.cost(search.computeWeights(x, direction, beta))
+				f_alpha = search.Cost(search.computeWeights(x, direction, alpha))
+				f_beta  = search.Cost(search.computeWeights(x, direction, beta))
 			}
 		}
 
